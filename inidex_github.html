@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Luxe | Tinh Hoa Mỹ Phẩm Thượng Lưu</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Playfair Display for headers, Inter for UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Spectral:ital,wght@0,200;0,300;1,200;1,300&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        spectral: ['Spectral', 'serif'],
+                    },
+                    colors: {
+                        accent: '#8B6E3F', // Giàu có hơn, đồng/vàng cổ
+                        gold: '#9D7D45',
+                        'gold-light': '#C5A059',
+                        cream: '#FDFCFB', // Trắng kem rất nhẹ
+                        ink: '#0F1110', // Đen sâu
+                        taupe: '#4A4238',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFCFB; color: #0F1110; scroll-behavior: smooth; overflow-x: hidden; }
+        .serif { font-family: 'Playfair Display', serif; }
+        . spectral { font-family: 'Spectral', serif; }
+        
+        .nav-scrolled { background: rgba(253, 252, 251, 0.98); backdrop-filter: blur(15px); padding: 0.75rem 0 !important; border-bottom: 1px solid rgba(139, 110, 63, 0.1); }
+        
+        .page { display: none; opacity: 0; transition: all 0.5s ease-out; }
+        .page.active { display: block; opacity: 1; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8B6E3F; border-radius: 10px; }
+        
+        .img-reveal { overflow: hidden; position: relative; }
+        .img-reveal img { transform: scale(1.1); transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .img-reveal:hover img { transform: scale(1); }
+
+        .btn-luxe { 
+            position: relative; 
+            overflow: hidden; 
+            transition: all 0.4s ease;
+        }
+        .btn-luxe::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 1px;
+            background: currentColor;
+            transition: width 0.4s ease;
+        }
+        .btn-luxe:hover::after { width: 100%; }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        .shimmer { animation: fadeInOut 2s infinite; }
+        
+        .modal-enter { transform: translate(-50%, -45%); opacity: 0; }
+        .modal-active { transform: translate(-50%, -50%); opacity: 1; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- NAVIGATION -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-700 py-10 bg-transparent">
+        <div class="max-w-[1800px] mx-auto px-8 md:px-16 flex items-center justify-between">
+            
+            <!-- Left: Navigation -->
+            <div class="hidden lg:flex items-center gap-12">
+                <button onclick="navigateTo('home')" class="btn-luxe text-[10px] uppercase tracking-[0.3em] font-medium hover:text-accent">Khám Phá</button>
+                <div class="relative group">
+                    <button onclick="navigateTo('shop')" class="btn-luxe text-[10px] uppercase tracking-[0.3em] font-medium hover:text-accent">Bộ Sưu Tập</button>
+                    <!-- Dropdown mockup -->
+                    <div class="absolute top-full left-0 pt-8 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-500">
+                        <div class="bg-white p-10 shadow-2xl border border-accent/10 min-w-[250px] space-y-4">
+                            <button onclick="filterShop('serum')" class="block text-[9px] uppercase tracking-widest hover:text-accent">Tinh Chất Serum</button>
+                            <button onclick="filterShop('cream')" class="block text-[9px] uppercase tracking-widest hover:text-accent">Kem Dưỡng Đặc Trị</button>
+                            <button onclick="filterShop('eye')" class="block text-[9px] uppercase tracking-widest hover:text-accent">Chăm Sóc Vùng Mắt</button>
+                            <button onclick="filterShop('mask')" class="block text-[9px] uppercase tracking-widest hover:text-accent">Mặt Nạ Phục Hồi</button>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="navigateTo('journal')" class="btn-luxe text-[10px] uppercase tracking-[0.3em] font-medium hover:text-accent">Tạp Chí</button>
+            </div>
+
+            <!-- Mobile Menu Btn -->
+            <button class="lg:hidden" onclick="toggleMenu(true)">
+                <i data-lucide="menu" stroke-width="1.2"></i>
+            </button>
+
+            <!-- Center: Brand -->
+            <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
+                <button onclick="navigateTo('home')" class="group flex flex-col items-center">
+                    <span class="serif text-2xl md:text-4xl tracking-[0.25em] font-light uppercase text-accent group-hover:scale-105 transition-transform duration-700">AURA LUXE</span>
+                    <div class="w-8 h-[1px] bg-accent/30 mt-2 transition-all group-hover:w-24"></div>
+                    <span class="spectral text-[9px] italic tracking-[0.5em] mt-3 opacity-40 uppercase">Haute Apothecary</span>
+                </button>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-8 md:gap-12">
+                <button onclick="toggleSearch(true)" class="hover:text-accent transition-colors">
+                    <i data-lucide="search" class="w-5 h-5" stroke-width="1"></i>
+                </button>
+                <div class="relative">
+                    <button onclick="navigateTo('wishlist')" class="hover:text-accent transition-colors">
+                        <i data-lucide="award" class="w-5 h-5" stroke-width="1"></i>
+                        <span id="wish-count" class="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full hidden"></span>
+                    </button>
+                </div>
+                <button onclick="toggleCart(true)" class="flex items-center gap-3 group">
+                    <div class="relative">
+                        <i data-lucide="shopping-bag" class="w-5 h-5" stroke-width="1"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-accent text-white text-[8px] w-3.5 h-3.5 flex items-center justify-center rounded-full hidden">0</span>
+                    </div>
+                    <span id="cart-total-nav" class="hidden md:block text-[9px] uppercase tracking-widest font-semibold opacity-40 group-hover:opacity-100 transition-opacity">$0.00</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SIDEBAR MENU (MOBILE) -->
+    <div id="mobile-menu" class="fixed inset-0 bg-cream z-[100] transition-transform duration-700 translate-x-[-100%] hidden">
+        <div class="p-10 flex flex-col h-full">
+            <button class="self-end" onclick="toggleMenu(false)">
+                <i data-lucide="x" class="w-10 h-10" stroke-width="1"></i>
+            </button>
+            <div class="mt-20 space-y-10">
+                <button onclick="navigateTo('home'); toggleMenu(false)" class="serif text-5xl italic hover:text-accent block">Trang Chủ</button>
+                <button onclick="navigateTo('shop'); toggleMenu(false)" class="serif text-5xl italic hover:text-accent block">Cửa Hàng</button>
+                <button onclick="navigateTo('journal'); toggleMenu(false)" class="serif text-5xl italic hover:text-accent block">Tạp Chí</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div id="cart-overlay" class="fixed inset-0 bg-ink/20 backdrop-blur-sm z-[150] opacity-0 pointer-events-none transition-opacity duration-500"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-lg bg-cream z-[151] translate-x-[100%] transition-transform duration-700 shadow-2xl flex flex-col">
+        <div class="p-12 border-b border-accent/5 flex justify-between items-center bg-white">
+            <h2 class="serif text-3xl italic tracking-tighter">Votre Panier</h2>
+            <button onclick="toggleCart(false)"><i data-lucide="x" class="w-8 h-8" stroke-width="1"></i></button>
+        </div>
+        <div id="cart-list" class="flex-grow overflow-y-auto p-12 custom-scrollbar">
+            <!-- Injected by JS -->
+        </div>
+        <div id="cart-checkout" class="p-12 bg-white border-t border-accent/10">
+            <div class="flex justify-between mb-8">
+                <span class="text-[10px] uppercase tracking-[0.3em] opacity-40">Subtotal</span>
+                <span id="cart-grand-total" class="serif text-2xl tracking-widest">$0.00</span>
+            </div>
+            <button class="w-full bg-ink text-white py-6 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-accent transition-all duration-500">Thanh Toán Ngay</button>
+            <p class="text-center text-[9px] mt-6 opacity-30 uppercase tracking-widest">Miễn phí vận chuyển cho đơn hàng trên $500</p>
+        </div>
+    </div>
+
+    <!-- SEARCH PANEL -->
+    <div id="search-panel" class="fixed inset-0 bg-cream/98 z-[200] opacity-0 pointer-events-none transition-all duration-700 p-10 flex flex-col items-center justify-center">
+        <button class="absolute top-12 right-12" onclick="toggleSearch(false)">
+            <i data-lucide="x" class="w-10 h-10" stroke-width="1"></i>
+        </button>
+        <div class="w-full max-w-4xl text-center">
+            <h3 class="serif text-5xl italic mb-16 text-accent">Tìm kiếm vẻ đẹp...</h3>
+            <input id="search-input" type="text" placeholder="KHÁM PHÁ TINH CHẤT, KEM DƯỠNG..." class="w-full bg-transparent border-b border-accent/20 py-8 text-3xl md:text-5xl text-center outline-none focus:border-accent transition-colors placeholder:opacity-10 spectral uppercase tracking-widest">
+            <div id="search-results" class="mt-20 grid grid-cols-1 md:grid-cols-2 gap-10 max-h-[50vh] overflow-y-auto custom-scrollbar"></div>
+        </div>
+    </div>
+
+    <!-- PAGES -->
+    <main>
+        
+        <!-- PAGE: HOME -->
+        <div id="page-home" class="page active">
+            <!-- HERO SECTION -->
+            <header class="relative h-screen flex items-center justify-center bg-[#F4F1ED]">
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1552046122-03184de85e08?auto=format&fit=crop&q=80&w=2600" class="w-full h-full object-cover opacity-90 scale-105" alt="Background">
+                    <div class="absolute inset-0 bg-gradient-to-b from-ink/10 via-transparent to-ink/20"></div>
+                </div>
+                
+                <div class="relative z-10 text-center px-6">
+                    <span class="spectral text-[11px] italic tracking-[0.8em] text-accent uppercase mb-10 block opacity-0 translate-y-4 transition-all duration-1000 delay-300 animate-in">Hạnh phúc đến từ sự tinh khiết</span>
+                    <h1 class="serif text-7xl md:text-[140px] text-white leading-none mb-12 tracking-tighter mix-blend-overlay">
+                        L’Éclat <br>
+                        <span class="italic font-light">Divin</span>
+                    </h1>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-10 mt-16 scale-95 opacity-0 transition-all duration-1000 delay-700 animate-in">
+                        <button onclick="navigateTo('shop')" class="bg-white/10 backdrop-blur-xl border border-white/20 text-white px-16 py-6 text-[10px] uppercase tracking-[0.4em] font-medium hover:bg-white hover:text-ink transition-all duration-700 shadow-2xl">
+                            Khám phá bộ sưu tập
+                        </button>
+                        <button onclick="navigateTo('journal')" class="text-white text-[10px] uppercase tracking-[0.4em] font-medium border-b border-white/30 pb-2 hover:border-white transition-all">
+                            Tạp chí làm đẹp
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Floating info -->
+                <div class="absolute bottom-16 left-16 hidden xl:block">
+                    <div class="flex items-center gap-4 text-white/40 text-[9px] uppercase tracking-[0.5em] vertical-rl">
+                        <span class="w-px h-12 bg-white/20"></span>
+                        Scroll To Reveal
+                    </div>
+                </div>
+            </header>
+
+            <!-- CURATED SELECTION -->
+            <section class="py-40 px-6">
+                <div class="max-w-[1600px] mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-32 gap-12">
+                        <div class="max-w-xl">
+                            <span class="text-accent text-[9px] uppercase tracking-[0.5em] font-bold mb-6 block">Trải nghiệm thượng lưu</span>
+                            <h2 class="serif text-5xl md:text-8xl leading-none tracking-tighter uppercase">Nghi Thức <br><span class="italic text-accent">Phục Hồi</span></h2>
+                        </div>
+                        <button onclick="navigateTo('shop')" class="group flex items-center gap-4 text-[10px] uppercase tracking-[0.4em] font-bold border-b border-accent/20 pb-4 hover:border-accent transition-all">
+                            Xem tất cả sản phẩm
+                            <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-2"></i>
+                        </button>
+                    </div>
+
+                    <div id="featured-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                        <!-- Injected -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ESSENCE SECTION (Bento) -->
+            <section class="py-40 bg-ink text-white px-6 overflow-hidden">
+                <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-24 items-center">
+                    <div class="lg:col-span-5 relative group">
+                        <div class="aspect-[4/6] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=1200" class="w-full h-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-105" alt="Ritual">
+                        </div>
+                        <div class="absolute -bottom-12 -right-12 bg-accent p-12 max-w-sm hidden md:block">
+                            <h3 class="serif text-3xl italic mb-6">Trí Tuệ Cổ Xưa</h3>
+                            <p class="text-white/70 text-xs leading-relaxed spectral italic">"Mỗi giọt tinh chất là một bản giao hưởng của 45 loại thảo mộc quý hiếm được chưng cất lạnh trong 90 ngày."</p>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7 pl-0 lg:pl-20">
+                        <span class="text-accent text-[10px] uppercase tracking-[0.6em] font-bold mb-12 block">Triết lý của chúng tôi</span>
+                        <h2 class="serif text-6xl md:text-[100px] leading-tight tracking-tighter uppercase mb-20">Khai Phóng <br><span class="italic text-accent text-glow">Hào Quang</span></h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-16">
+                            <div>
+                                <span class="serif text-4xl italic text-accent block mb-6">01. Tinh Khiết</span>
+                                <p class="text-white/40 text-sm font-light leading-relaxed">Sử dụng nguồn nguyên liệu đạt tiêu chuẩn ECOCERT, được thu hái thủ công tại dãy núi Alps.</p>
+                            </div>
+                            <div>
+                                <span class="serif text-4xl italic text-accent block mb-6">02. Độc Bản</span>
+                                <p class="text-white/40 text-sm font-light leading-relaxed">Sản xuất theo lô giới hạn để đảm bảo sự tươi mới và hoạt tính sinh học cao nhất cho làn da.</p>
+                            </div>
+                            <div>
+                                <span class="serif text-4xl italic text-accent block mb-6">03. Bền Vững</span>
+                                <p class="text-white/40 text-sm font-light leading-relaxed">Bao bì thủy tinh tái chế thủ công và mực in từ đậu nành, cam kết giảm thiểu dấu chân carbon.</p>
+                            </div>
+                            <div>
+                                <span class="serif text-4xl italic text-accent block mb-6">04. Hiệu Quả</span>
+                                <p class="text-white/40 text-sm font-light leading-relaxed">Kiểm nghiệm lâm sàng chứng minh hiệu quả phục hồi hàng rào bảo vệ da chỉ sau 7 ngày.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE: SHOP -->
+        <div id="page-shop" class="page">
+            <section class="pt-60 pb-40 px-6">
+                <div class="max-w-[1600px] mx-auto">
+                    <div class="text-center mb-40">
+                        <span class="spectral text-[12px] italic tracking-[0.8em] text-accent uppercase mb-8 block">Exclusive Selection</span>
+                        <h1 class="serif text-7xl md:text-[120px] tracking-tighter leading-none uppercase">Cửa Hàng <br><span class="italic text-accent">Thượng Lưu</span></h1>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="flex flex-wrap justify-center gap-12 mb-32 border-b border-accent/10 pb-12">
+                        <button onclick="filterShop('all')" class="text-[10px] uppercase tracking-[0.4em] font-bold hover:text-accent transition-colors">Tất Cả</button>
+                        <button onclick="filterShop('serum')" class="text-[10px] uppercase tracking-[0.4em] font-bold hover:text-accent transition-colors">Serum</button>
+                        <button onclick="filterShop('cream')" class="text-[10px] uppercase tracking-[0.4em] font-bold hover:text-accent transition-colors">Kem Dưỡng</button>
+                        <button onclick="filterShop('eye')" class="text-[10px] uppercase tracking-[0.4em] font-bold hover:text-accent transition-colors">Chăm Sóc Mắt</button>
+                    </div>
+
+                    <div id="shop-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-24">
+                        <!-- Injected -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE: JOURNAL -->
+        <div id="page-journal" class="page">
+            <section class="pt-60 pb-40 px-6">
+                <div class="max-w-[1400px] mx-auto">
+                    <div class="flex flex-col lg:flex-row gap-32">
+                        <div class="lg:w-2/3">
+                            <h1 class="serif text-8xl italic mb-32 tracking-tighter">The Luxe <br>Journal</h1>
+                            <div id="journal-list" class="space-y-40">
+                                <!-- Blog posts -->
+                            </div>
+                        </div>
+                        <aside class="lg:w-1/3">
+                            <div class="sticky top-40 bg-white p-12 border border-accent/5">
+                                <h4 class="text-[11px] uppercase tracking-[0.3em] font-bold text-accent mb-12 border-b border-accent/10 pb-6">Chuyên Mục</h4>
+                                <ul class="space-y-8">
+                                    <li><button class="text-[13px] font-light hover:text-accent tracking-wide block">Nghi Thức Skincare</button></li>
+                                    <li><button class="text-[13px] font-light hover:text-accent tracking-wide block">Thành Phần Quý Hiếm</button></li>
+                                    <li><button class="text-[13px] font-light hover:text-accent tracking-wide block">Khoa Học Chống Lão Hóa</button></li>
+                                    <li><button class="text-[13px] font-light hover:text-accent tracking-wide block">Lối Sống Thượng Lưu</button></li>
+                                </ul>
+                                
+                                <div class="mt-24 space-y-12">
+                                    <h4 class="text-[11px] uppercase tracking-[0.3em] font-bold text-accent">Nguồn Cảm Hứng</h4>
+                                    <div class="aspect-[4/5] bg-cream overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover">
+                                    </div>
+                                    <p class="text-[12px] italic opacity-40">"Khám phá sự cân bằng hoàn mỹ giúp làn da tỏa sáng từ bên trong."</p>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE: WISHLIST -->
+        <div id="page-wishlist" class="page">
+            <section class="pt-60 pb-40 px-6">
+                <div class="max-w-[1600px] mx-auto">
+                    <div class="flex items-center justify-between mb-32 border-b border-accent/10 pb-12">
+                        <h1 class="serif text-6xl italic">My Collection</h1>
+                        <span id="wishlist-count-text" class="text-[10px] uppercase tracking-[0.4em] opacity-40">0 ITEMS SAVED</span>
+                    </div>
+                    <div id="wishlist-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
+                        <!-- Injected -->
+                    </div>
+                    <div id="wishlist-empty" class="hidden py-40 text-center flex flex-col items-center">
+                        <i data-lucide="award" class="w-20 h-20 text-accent/10 mb-10" stroke-width="0.5"></i>
+                        <p class="serif text-3xl italic mb-10">Bộ sưu tập cá nhân của bạn hiện đang trống...</p>
+                        <button onclick="navigateTo('shop')" class="text-[10px] uppercase tracking-[0.5em] font-bold border-b border-accent pb-2">Bắt đầu khám phá</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white pt-40 pb-20 border-t border-accent/5 px-8">
+        <div class="max-w-[1800px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-24 mb-40">
+                <div class="lg:col-span-2">
+                    <span class="serif text-4xl tracking-[0.25em] text-accent font-light mb-10 block">AURA LUXE</span>
+                    <p class="text- ink/40 font-light text-sm max-w-sm leading-relaxed mb-12">
+                        Định nghĩa lại vẻ đẹp thông qua những nghi thức chăm sóc da thượng lưu, nơi khoa học hiện đại hòa quyện cùng trí tuệ của thiên nhiên.
+                    </p>
+                    <div class="flex gap-8 group">
+                        <a href="mailto:27a4042953@gmail.com" class="text-[10px] uppercase tracking-[0.4em] font-bold border-b border-accent/20 pb-1 transition-all hover:border-accent">27a4042953@gmail.com</a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-[11px] uppercase tracking-[0.4em] font-bold text-accent mb-10">Dịch Vụ Khách Hàng</h5>
+                    <ul class="space-y-6 text-[11px] uppercase tracking-[0.3em] font-bold text-ink/30">
+                        <li><a href="#" class="hover:text-accent transition-colors">Vận Chuyển</a></li>
+                        <li><a href="#" class="hover:text-accent transition-colors">Theo Dõi Đơn Hàng</a></li>
+                        <li><a href="#" class="hover:text-accent transition-colors">Câu Hỏi Thường Gặp</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-[11px] uppercase tracking-[0.4em] font-bold text-accent mb-10">Aura Luxe World</h5>
+                    <ul class="space-y-6 text-[11px] uppercase tracking-[0.3em] font-bold text-ink/30">
+                        <li><a href="#" class="hover:text-accent transition-colors">Journal</a></li>
+                        <li><a href="#" class="hover:text-accent transition-colors">Triết Lý Thương Hiệu</a></li>
+                        <li><a href="#" class="hover:text-accent transition-colors">Về Chúng Tôi</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-[11px] uppercase tracking-[0.4em] font-bold text-accent mb-10">Kết Nối</h5>
+                    <ul class="space-y-6 text-[11px] uppercase tracking-[0.3em] font-bold text-ink/30">
+                        <li><a href="#" class="hover:text-accent transition-colors">Instagram</a></li>
+                        <li><a href="#" class="hover:text-accent transition-colors">Facebook</a></li>
+                        <li><a href="#" class="hover:text-accent transition-colors">Pinterest</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center gap-10 pt-16 border-t border-accent/5">
+                <span class="text-[9px] uppercase tracking-[0.5em] text-ink/20">© 2024 LUXE APOTHECARY. CRAFTED IN FRANCE. VIETNAM HQ.</span>
+                <div class="flex gap-10">
+                    <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-accent">Tiếng Việt</span>
+                    <span class="text-[10px] uppercase tracking-[0.4em] font-bold text-ink/10">English</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="product-modal" class="fixed inset-0 z-[300] hidden">
+        <div class="absolute inset-0 bg-ink/20 backdrop-blur-xl transition-opacity duration-700" onclick="closeProductDetail()"></div>
+        <div id="modal-container" class="fixed top-1/2 left-1/2 w-[95%] max-w-6xl h-[90vh] bg-cream shadow-2xl overflow-hidden modal-enter transition-all duration-700">
+            <button class="absolute top-10 right-10 z-[310] group" onclick="closeProductDetail()">
+                <i data-lucide="x" class="w-10 h-10 group-hover:rotate-90 transition-transform" stroke-width="1"></i>
+            </button>
+            <div id="modal-content" class="grid grid-cols-1 lg:grid-cols-2 h-full overflow-y-auto custom-scrollbar">
+                <!-- Injected -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // EXPANDED DATA
+        const DATA = {
+            products: [
+                { id: "s1", name: "Imperial Gold Elixir", category: "serum", price: 285, originalPrice: 350, image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1552046122-03184de85e08?auto=format&fit=crop&q=80&w=1200", desc: "A masterpiece of bio-technology, distilling the power of pure 24K gold and Edelweiss stem cells to provide unparalleled radiance and lift.", ingredients: ["24K Colloidal Gold", "Edelweiss Stem Cells", "Saffron Stigma", "Platinum Particles"], volumes: ["30ml", "50ml"], rating: 4.9, reviews: 124 },
+                { id: "c1", name: "Midnight Jade Cream", category: "cream", price: 195, originalPrice: 240, image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=80&w=1200", desc: "A cocooning night treatment that utilizes traditional extraction of Black Orchid to rebuild skin structure while you sleep.", ingredients: ["Black Orchid", "Jade Powder", "Melatonin", "Squalane"], volumes: ["50ml"], rating: 4.8, reviews: 89 },
+                { id: "e1", name: "Celestial Eye Lifting Balm", category: "eye", price: 145, originalPrice: 180, image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=1200", desc: "Targets all signs of fatigue and aging around the orbital area with immediate cooling and depuffing micro-technology.", ingredients: ["Peptide Complex 7", "Caffeine", "Silk Proteins", "Rose Water"], volumes: ["15ml"], rating: 5.0, reviews: 56 },
+                { id: "s2", name: "Vitamin C Luster Serum", category: "serum", price: 165, originalPrice: 210, image: "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=80&w=1200", desc: "Stabilized 20% THD Ascorbate combined with Kakadu Plum to deliver the most powerful antioxidant protection available.", ingredients: ["THD Ascorbate", "Kakadu Plum", "Ferulic Acid", "Vitamin E"], volumes: ["30ml"], rating: 4.7, reviews: 210 },
+                { id: "m1", name: "Alpine Glacier Infusion Mask", category: "mask", price: 120, originalPrice: 155, image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=80&w=1200", desc: "A transformative cooling treatment that drenches skin in mineral-rich Alpine water and molecular oxygen.", ingredients: ["Alpine Mineral Water", "Molecular Oxygen", "Icelandic Moss"], volumes: ["75ml"], rating: 4.9, reviews: 78 },
+                { id: "c2", name: "Saffron Day Veil SPF 50", category: "cream", price: 135, originalPrice: 170, image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&q=80&w=1200", desc: "Ultimate daily defense. A lightweight veil that provides broad-spectrum protection while actively brightening with Saffron.", ingredients: ["Saffron", "Zinc Oxide", "Niacinamide"], volumes: ["50ml"], rating: 4.6, reviews: 145 },
+                { id: "s3", name: "Retinol Renew Elixir", category: "serum", price: 210, originalPrice: 265, image: "https://images.unsplash.com/photo-1556228722-dcaaec2f67bd?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80&w=1200", desc: "Gentle yet incredibly effective. Time-released encapsulated retinol for zero irritation and maximum resurfacing.", ingredients: ["Encapsulated Retinol", "Blue Algae", "Copper Peptides"], volumes: ["30ml"], rating: 4.9, reviews: 92 },
+                { id: "e2", name: "Black Pearl Eye Serum", category: "eye", price: 185, originalPrice: 230, image: "https://images.unsplash.com/photo-1591130901618-3f0a827d846b?auto=format&fit=crop&q=80&w=800", secondImage: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=1200", desc: "Utilizing the rare reflective properties of Tahitian Black Pearl to diffuse light and diminish the look of dark circles.", ingredients: ["Black Pearl Powder", "Plankton Extract", "Hyaluronic Acid"], volumes: ["20ml"], rating: 4.7, reviews: 34 }
+            ],
+            posts: [
+                { id: "p1", title: "Nghệ Thuật Lớp Nền Ánh Kim: Tinh Hoa Vàng 24K", category: "Nghi Thức Skincare", date: "FEB 12, 2024", image: "https://images.unsplash.com/photo-1552046122-03184de85e08?auto=format&fit=crop&q=80&w=1200", excerpt: "Khám phá cách tinh thể vàng tương tác với ánh sáng và tế bào da để tạo nên một diện mạo rạng rỡ không tuổi." },
+                { id: "p2", title: "Orchid Noir: Phép Màu Giữa Đêm Khuya", category: "Thành Phần Quý Hiếm", date: "JAN 28, 2024", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=1200", excerpt: "Sâu trong rừng nhiệt đới, loại Lan đen quý hiếm ẩn chứa khả năng tái tạo hàng rào bảo vệ da mạnh mẽ nhất." }
+            ]
+        };
+
+        // STATE MANAGEMENT
+        let cartState = [];
+        let wishlistState = [];
+        let shopFilter = 'all';
+
+        // INITIALIZATION
+        function init() {
+            lucide.createIcons();
+            renderFeatured();
+            
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 80) nav.classList.add('nav-scrolled');
+                else nav.classList.remove('nav-scrolled');
+            });
+
+            // Smooth reveal effect on load
+            document.querySelectorAll('.animate-in').forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+                el.style.scale = '1';
+            });
+            
+            setupSearch();
+        }
+
+        // NAVIGATION
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page-' + pageId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            if (pageId === 'shop') renderShop();
+            if (pageId === 'wishlist') renderWishlist();
+            if (pageId === 'journal') renderJournal();
+        }
+
+        function toggleMenu(show) {
+            const el = document.getElementById('mobile-menu');
+            if (show) {
+                el.classList.remove('hidden');
+                setTimeout(() => el.style.transform = 'translateX(0)', 10);
+            } else {
+                el.style.transform = 'translateX(-100%)';
+                setTimeout(() => el.classList.add('hidden'), 700);
+            }
+        }
+
+        function toggleCart(show) {
+            const overlay = document.getElementById('cart-overlay');
+            const drawer = document.getElementById('cart-drawer');
+            if (show) {
+                overlay.classList.remove('pointer-events-none');
+                overlay.style.opacity = '1';
+                drawer.style.transform = 'translateX(0)';
+                renderCart();
+            } else {
+                overlay.style.opacity = '0';
+                overlay.classList.add('pointer-events-none');
+                drawer.style.transform = 'translateX(100%)';
+            }
+        }
+
+        function toggleSearch(show) {
+            const panel = document.getElementById('search-panel');
+            if (show) {
+                panel.classList.remove('pointer-events-none');
+                panel.style.opacity = '1';
+                document.getElementById('search-input').focus();
+            } else {
+                panel.style.opacity = '0';
+                panel.classList.add('pointer-events-none');
+            }
+        }
+
+        // RENDERING
+        function renderFeatured() {
+            const container = document.getElementById('featured-grid');
+            container.innerHTML = DATA.products.slice(0, 4).map(p => productCardTemplate(p)).join('');
+            lucide.createIcons();
+        }
+
+        function renderShop() {
+            const container = document.getElementById('shop-grid');
+            let filtered = DATA.products;
+            if (shopFilter !== 'all') filtered = DATA.products.filter(p => p.category === shopFilter);
+            container.innerHTML = filtered.map(p => productCardTemplate(p)).join('');
+            lucide.createIcons();
+        }
+
+        function filterShop(cat) {
+            shopFilter = cat;
+            renderShop();
+        }
+
+        function productCardTemplate(p) {
+            const isWished = wishlistState.includes(p.id);
+            const discount = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+            
+            return `
+                <div class="group relative">
+                    <div class="img-reveal aspect-[4/5] bg-cream border border-accent/5">
+                        <img src="${p.image}" class="w-full h-full object-cover">
+                        ${p.secondImage ? `<img src="${p.secondImage}" class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000">` : ''}
+                        
+                        <!-- Badges -->
+                        <div class="absolute top-6 left-6">
+                            <span class="bg-accent text-white text-[8px] uppercase tracking-[0.3em] font-bold px-4 py-1.5 shadow-xl">-${discount}% OFF</span>
+                        </div>
+
+                        <!-- Hover Actions -->
+                        <div class="absolute top-6 right-6 flex flex-col gap-4">
+                            <button onclick="toggleWish('${p.id}')" class="w-10 h-10 bg-white/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center translate-x-8 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white ${isWished ? 'bg-accent text-white translate-x-0 opacity-100' : ''}">
+                                <i data-lucide="award" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="openProductDetail('${p.id}')" class="w-10 h-10 bg-white/60 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center translate-x-8 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white delay-75">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <button onclick="addToCart('${p.id}')" class="absolute bottom-0 left-0 w-full bg-ink text-white py-5 text-[9px] uppercase tracking-[0.4em] font-bold translate-y-full group-hover:translate-y-0 transition-transform duration-500 hover:bg-accent">
+                            Ajouter au panier
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 text-center px-4">
+                        <span class="text-accent text-[8px] uppercase tracking-[0.5em] font-bold block mb-3">${p.category}</span>
+                        <h4 onclick="openProductDetail('${p.id}')" class="serif text-xl md:text-2xl tracking-tighter uppercase mb-4 hover:text-accent transition-colors cursor-pointer">${p.name}</h4>
+                        <div class="flex items-center justify-center gap-4">
+                            <span class="text-ink/20 line-through text-[11px] font-medium tracking-widest">$${p.originalPrice}.00</span>
+                            <span class="serif text-lg tracking-widest text-accent">$${p.price}.00</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // CART LOGIC
+        function addToCart(id) {
+            const product = DATA.products.find(p => p.id === id);
+            const existing = cartState.find(i => i.id === id);
+            if (existing) existing.qty++;
+            else cartState.push({ ...product, qty: 1 });
+            
+            updateCartBadge();
+            toggleCart(true);
+        }
+
+        function removeFromCart(id) {
+            cartState = cartState.filter(i => i.id !== id);
+            updateCartBadge();
+            renderCart();
+        }
+
+        function updateQty(id, delta) {
+            const item = cartState.find(i => i.id === id);
+            item.qty += delta;
+            if (item.qty <= 0) removeFromCart(id);
+            else {
+                updateCartBadge();
+                renderCart();
+            }
+        }
+
+        function updateCartBadge() {
+            const count = cartState.reduce((acc, i) => acc + i.qty, 0);
+            const total = cartState.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            
+            const badge = document.getElementById('cart-badge');
+            badge.innerText = count;
+            badge.classList.toggle('hidden', count === 0);
+            
+            document.getElementById('cart-total-nav').innerText = `$${total}.00`;
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cart-list');
+            const subtotalEl = document.getElementById('cart-grand-total');
+            const total = cartState.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            
+            if (cartState.length === 0) {
+                list.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center opacity-20">
+                        <i data-lucide="shopping-bag" class="w-16 h-16 mb-6" stroke-width="0.5"></i>
+                        <p class="serif text-xl italic">Panier Vide</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = cartState.map(i => `
+                    <div class="flex gap-8 mb-10 pb-8 border-b border-accent/5">
+                        <div class="w-24 aspect-[4/5] bg-white group-hover:scale-105 transition-transform">
+                            <img src="${i.image}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-grow flex flex-col justify-between">
+                            <div>
+                                <h5 class="serif text-xl uppercase tracking-tighter mb-2">${i.name}</h5>
+                                <span class="text-accent text-[11px] tracking-widest font-bold">$${i.price}.00</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center border border-accent/20 h-10">
+                                    <button onclick="updateQty('${i.id}', -1)" class="w-8 hover:bg-accent/5">-</button>
+                                    <span class="w-10 text-center text-[11px] font-bold">${i.qty}</span>
+                                    <button onclick="updateQty('${i.id}', 1)" class="w-8 hover:bg-accent/5">+</button>
+                                </div>
+                                <button onclick="removeFromCart('${i.id}')" class="text-ink/20 hover:text-accent"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            subtotalEl.innerText = `$${total}.00`;
+            lucide.createIcons();
+        }
+
+        // WISHLIST LOGIC
+        function toggleWish(id) {
+            const idx = wishlistState.indexOf(id);
+            if (idx > -1) wishlistState.splice(idx, 1);
+            else wishlistState.push(id);
+            
+            document.getElementById('wish-count').classList.toggle('hidden', wishlistState.length === 0);
+            renderFeatured();
+            if (document.getElementById('page-shop').classList.contains('active')) renderShop();
+            if (document.getElementById('page-wishlist').classList.contains('active')) renderWishlist();
+        }
+
+        function renderWishlist() {
+            const grid = document.getElementById('wishlist-grid');
+            const empty = document.getElementById('wishlist-empty');
+            const countText = document.getElementById('wishlist-count-text');
+            const items = DATA.products.filter(p => wishlistState.includes(p.id));
+            
+            countText.innerText = `${wishlistState.length} ITEMS SAVED`;
+            
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                grid.innerHTML = items.map(p => productCardTemplate(p)).join('');
+            }
+            lucide.createIcons();
+        }
+
+        // PRODUCT DETAIL MODAL
+        function openProductDetail(id) {
+            const p = DATA.products.find(prod => prod.id === id);
+            const container = document.getElementById('modal-container');
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <div class="bg-white flex items-center justify-center p-12 lg:p-24 border-b lg:border-b-0 lg:border-r border-accent/5">
+                    <div class="relative w-full max-w-sm aspect-[4/5] shadow-2xl scale-95 opacity-0 transition-all duration-1000 animate-in group">
+                        <img src="${p.image}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                </div>
+                <div class="p-12 lg:p-24 flex flex-col">
+                    <div class="mb-16">
+                        <span class="text-accent text-[11px] uppercase tracking-[0.5em] font-bold mb-6 block">${p.category}</span>
+                        <h2 class="serif text-6xl md:text-7xl leading-tight tracking-tighter uppercase mb-10">${p.name}</h2>
+                        <div class="flex items-center gap-8 mb-12">
+                            <span class="text-ink/20 line-through text-lg font-light tracking-widest">$${p.originalPrice}.00</span>
+                            <span class="serif text-4xl tracking-widest text-accent">$${p.price}.00</span>
+                        </div>
+                        <div class="flex text-accent gap-1 shimmer">
+                            ${Array(5).fill('<i data-lucide="star" class="w-3.5 h-3.5 fill-accent"></i>').join('')}
+                            <span class="ml-4 text-[9px] uppercase tracking-widest font-bold opacity-30">(${p.reviews} Đánh giá)</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-12 flex-grow overflow-auto no-scrollbar pb-12">
+                        <p class="text-[15px] font-light text-ink/70 leading-relaxed spectral italic border-l-2 border-accent/20 pl-8">
+                            "${p.desc}"
+                        </p>
+                        
+                        <div class="grid grid-cols-2 gap-12">
+                            <div class="space-y-4">
+                                <span class="text-[10px] uppercase tracking-widest font-bold opacity-30">Volumes</span>
+                                <div class="flex gap-4">
+                                    ${p.volumes.map(v => `<span class="border border-accent/10 px-6 py-2 text-[10px] font-bold tracking-widest">${v}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <span class="text-[10px] uppercase tracking-widest font-bold opacity-30">Ingrédients Clés</span>
+                            <div class="flex flex-wrap gap-4">
+                                ${p.ingredients.map(ing => `<span class="bg-accent/5 px-6 py-2 text-[9px] font-bold uppercase tracking-widest text-accent border border-accent/10">${ing}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-20 pt-10 border-t border-accent/10 flex gap-6">
+                        <button onclick="addToCart('${p.id}'); closeProductDetail();" class="flex-grow bg-accent text-white h-20 text-[11px] uppercase tracking-[0.5em] font-bold hover:bg-ink transition-all shadow-2xl">
+                            Ajouter au panier — $${p.price}.00
+                        </button>
+                        <button onclick="toggleWish('${p.id}')" class="w-20 h-20 border border-accent/20 flex items-center justify-center hover:bg-accent hover:text-white transition-all">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                container.classList.remove('modal-enter');
+                container.classList.add('modal-active');
+            }, 50);
+            lucide.createIcons();
+        }
+
+        function closeProductDetail() {
+            const container = document.getElementById('modal-container');
+            container.classList.remove('modal-active');
+            container.classList.add('modal-enter');
+            setTimeout(() => {
+                document.getElementById('product-modal').classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 600);
+        }
+
+        // SEARCH LOGIC
+        function setupSearch() {
+            const input = document.getElementById('search-input');
+            const results = document.getElementById('search-results');
+            
+            input.addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase().trim();
+                if (!q) { results.innerHTML = ''; return; }
+                
+                const matched = DATA.products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+                results.innerHTML = matched.map(p => `
+                    <button onclick="openProductDetail('${p.id}'); toggleSearch(false);" class="flex items-center gap-8 p-6 hover:bg-white transition-all border border-transparent hover:border-accent/10 text-left">
+                        <div class="w-20 aspect-[4/5] flex-shrink-0">
+                            <img src="${p.image}" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <span class="text-accent text-[8px] uppercase tracking-widest font-bold">${p.category}</span>
+                            <h5 class="serif text-2xl tracking-tighter uppercase line-clamp-1">${p.name}</h5>
+                            <span class="text-sm font-bold opacity-30">$${p.price}.00</span>
+                        </div>
+                    </button>
+                `).join('') || '<p class="col-span-2 text-ink/20 italic text-sm">Aucun résultat trouvé...</p>';
+            });
+        }
+
+        // JOURNAL
+        function renderJournal() {
+            const list = document.getElementById('journal-list');
+            list.innerHTML = DATA.posts.map(post => `
+                <article class="group">
+                    <div class="relative aspect-[16/9] bg-cream mb-16 overflow-hidden">
+                        <img src="${post.image}" class="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-110 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100">
+                    </div>
+                    <div class="max-w-xl">
+                        <span class="text-accent text-[10px] uppercase tracking-[0.6em] font-bold mb-8 block">${post.category}</span>
+                        <h2 class="serif text-5xl md:text-6xl italic leading-tight mb-10 group-hover:text-gold transition-colors">${post.title}</h2>
+                        <p class="text-ink/40 text-sm leading-relaxed spectral italic mb-12">"${post.excerpt}"</p>
+                        <div class="flex items-center justify-between border-t border-accent/10 pt-10">
+                            <button class="text-[10px] uppercase tracking-[0.4em] font-bold border-b border-accent pb-2">Lire la suite</button>
+                            <span class="text-[9px] uppercase tracking-[0.3em] font-bold opacity-20">${post.date} / JOURNAL</span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
